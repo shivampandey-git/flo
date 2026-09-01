@@ -1,1 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLO — an archival blockchain</title>
+<meta name="description" content="FLO is a proof-of-work blockchain that lets any transaction carry up to 1,080 bytes of permanent, arbitrary data.">
+<style>
+  :root {
+    --ink: #12161c;
+    --panel: #181e27;
+    --rule: #2a323e;
+    --rule-soft: #1f2733;
+    --paper: #ece7dc;
+    --paper-dim: #9aa1ac;
+    --copper: #c97a3d;
+    --copper-dim: #8a5730;
+    --copper-bright: #e0985c;
+    --serif: Iowan Old Style, Palatino Linotype, Palatino, Georgia, "Noto Serif", serif;
+    --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
 
+  * { box-sizing: border-box; }
+
+  html { background: var(--ink); }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--copper-bright); text-decoration-color: var(--copper-dim); text-underline-offset: 3px; }
+  a:hover { color: var(--copper-bright); text-decoration-color: var(--copper-bright); }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- Header ---------- */
+  header.top {
+    border-bottom: 1px solid var(--rule);
+    padding: 22px 0;
+  }
+  header.top .wrap {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .wordmark {
+    font-family: var(--serif);
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+  }
+  .wordmark em {
+    font-style: normal;
+    color: var(--copper);
+  }
+  nav.top-links a {
+    margin-left: 22px;
+    font-size: 14px;
+    color: var(--paper-dim);
+    text-decoration: none;
+  }
+  nav.top-links a:hover { color: var(--paper); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 76px 0 56px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 46px;
+    line-height: 1.18;
+    margin: 0 0 22px;
+    max-width: 15ch;
+    color: var(--paper);
+  }
+  .hero p.lede {
+    font-size: 19px;
+    line-height: 1.65;
+    color: #cfcabd;
+    max-width: 54ch;
+    margin: 0 0 30px;
+  }
+  .hero .stat-line {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--copper);
+    letter-spacing: 0.01em;
+    margin-bottom: 34px;
+  }
+  .hero .stat-line span.dim { color: var(--paper-dim); }
+
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 11px 20px;
+    border-radius: 3px;
+    font-size: 15px;
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+  .btn-solid {
+    background: var(--copper);
+    color: #1a1006;
+    font-weight: 600;
+  }
+  .btn-solid:hover { background: var(--copper-bright); color: #1a1006; }
+  .btn-line {
+    border-color: var(--rule);
+    color: var(--paper);
+  }
+  .btn-line:hover { border-color: var(--paper-dim); color: var(--paper); }
+
+  /* ---------- Signature ledger animation ---------- */
+  .ledger {
+    margin: 8px 0 10px;
+    border: 1px solid var(--rule);
+    background: var(--panel);
+    border-radius: 4px;
+    padding: 26px 26px 22px;
+    overflow: hidden;
+  }
+  .ledger svg { display: block; width: 100%; height: auto; }
+  .ledger-caption {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--paper-dim);
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .ledger-caption .flash { color: var(--copper); }
+
+  .block-rect {
+    fill: var(--rule-soft);
+    stroke: var(--rule);
+    stroke-width: 1;
+  }
+  .block-label {
+    fill: var(--paper-dim);
+    font-family: var(--mono);
+    font-size: 10px;
+  }
+  .chain-line {
+    stroke: var(--rule);
+    stroke-width: 1.5;
+  }
+  #writeBlock rect { fill: var(--panel); stroke: var(--copper-dim); }
+  #writeBlock .block-label { fill: var(--paper); }
+  #writeBlock .data-fill {
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 130;
+    stroke-dashoffset: 130;
+    animation: write 1.8s ease-out 0.4s forwards;
+  }
+  #writeBlock .data-tag {
+    fill: var(--copper);
+    font-family: var(--mono);
+    font-size: 9px;
+    opacity: 0;
+    animation: fadein 0.4s ease-out 1.9s forwards;
+  }
+  @keyframes write {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes fadein {
+    to { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #writeBlock .data-fill { animation: none; stroke-dashoffset: 0; }
+    #writeBlock .data-tag { animation: none; opacity: 1; }
+  }
+
+  /* ---------- Sections ---------- */
+  section {
+    padding: 52px 0;
+    border-top: 1px solid var(--rule);
+  }
+  section .label {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--copper);
+    margin: 0 0 18px;
+  }
+  section h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 28px;
+    margin: 0 0 18px;
+    color: var(--paper);
+    max-width: 22ch;
+  }
+  section p {
+    color: #cfcabd;
+    max-width: 62ch;
+    margin: 0 0 16px;
+  }
+  section p:last-child { margin-bottom: 0; }
+
+  .kv {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 10px 20px;
+    margin-top: 26px;
+    font-size: 15px;
+  }
+  .kv dt {
+    font-family: var(--mono);
+    color: var(--paper-dim);
+    font-size: 13px;
+    padding-top: 2px;
+  }
+  .kv dd {
+    margin: 0;
+    color: var(--paper);
+  }
+
+  pre {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--paper);
+    line-height: 1.65;
+  }
+  code { font-family: var(--mono); font-size: 0.92em; }
+  p code, li code {
+    background: var(--panel);
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--rule-soft);
+  }
+
+  .platform-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .platform-list li {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 16px 14px;
+  }
+  .platform-list .plat-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--copper);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .platform-list p { font-size: 14px; margin: 0; color: var(--paper-dim); max-width: none; }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 34px 0 46px;
+  }
+  footer .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer .fine {
+    font-size: 13.5px;
+    color: var(--paper-dim);
+    max-width: 46ch;
+  }
+  footer nav a {
+    display: block;
+    font-size: 14px;
+    color: var(--paper-dim);
+    text-decoration: none;
+    margin-bottom: 8px;
+  }
+  footer nav a:hover { color: var(--paper); }
+
+  @media (max-width: 620px) {
+    .hero h1 { font-size: 34px; }
+    .hero p.lede { font-size: 17px; }
+    .kv { grid-template-columns: 1fr; gap: 4px 0; }
+    .kv dt { padding-top: 10px; }
+    .platform-list { grid-template-columns: 1fr; }
+    nav.top-links a { margin-left: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="wordmark">FL<em>O</em></div>
+    <nav class="top-links">
+      <a href="#flodata">floData</a>
+      <a href="#running">Run a node</a>
+      <a href="https://github.com/shivampandey-git/flo">Source</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="hero" style="border-top:none; padding-top:76px;">
+      <h1>A blockchain built to hold onto things.</h1>
+      <p class="lede">
+        FLO is a proof-of-work cryptocurrency, forked from Bitcoin, that adds one
+        deliberate feature: every transaction can carry up to 1,080 bytes of
+        arbitrary data, written permanently into the chain. That's enough room
+        for a signature, a hash, a record, or a small note that outlives whoever
+        wrote it.
+      </p>
+      <div class="stat-line">1,080 bytes <span class="dim">per transaction ·</span> scrypt proof-of-work <span class="dim">· no premine, launched 2013</span></div>
+
+      <div class="ledger">
+        <svg viewBox="0 0 680 130" role="img" aria-label="Diagram: a chain of blocks, with data written into one transaction">
+          <line x1="70" y1="65" x2="620" y2="65" class="chain-line"></line>
+
+          <g>
+            <rect x="40" y="42" width="60" height="46" rx="3" class="block-rect"></rect>
+            <text x="70" y="69" text-anchor="middle" class="block-label">#821,004</text>
+          </g>
+          <g>
+            <rect x="170" y="42" width="60" height="46" rx="3" class="block-rect"></rect>
+            <text x="200" y="69" text-anchor="middle" class="block-label">#821,005</text>
+          </g>
+
+          <g id="writeBlock">
+            <rect x="300" y="32" width="80" height="66" rx="3"></rect>
+            <text x="340" y="55" text-anchor="middle" class="block-label">#821,006</text>
+            <path d="M 312 68 Q 340 78 368 68" class="data-fill"></path>
+            <text x="340" y="90" text-anchor="middle" class="data-tag">floData</text>
+          </g>
+
+          <g>
+            <rect x="450" y="42" width="60" height="46" rx="3" class="block-rect"></rect>
+            <text x="480" y="69" text-anchor="middle" class="block-label">#821,007</text>
+          </g>
+          <g>
+            <rect x="580" y="42" width="40" height="46" rx="3" class="block-rect" opacity="0.5"></rect>
+            <text x="600" y="69" text-anchor="middle" class="block-label" opacity="0.6">…</text>
+          </g>
+        </svg>
+        <div class="ledger-caption">
+          <span>one field, unlocked on every block</span>
+          <span class="flash">written once, kept forever</span>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#running">Run a node</a>
+        <a class="btn btn-line" href="https://github.com/shivampandey-git/flo">View source on GitHub</a>
+      </div>
+    </section>
+
+    <section id="flodata">
+      <p class="label">the floData field</p>
+      <h2>Payments, plus a place to write.</h2>
+      <p>
+        Ordinary FLO transactions move value the way Bitcoin's do. The
+        difference is a field called <code>floData</code>: an optional slot on
+        every transaction where anyone can attach up to 1,080 bytes of their
+        own data for a small fee. Once it's mined into a block, it sits there
+        permanently, replicated across every full node on the network.
+      </p>
+      <p>
+        That's enough for a document hash, a timestamped signature, or a
+        pointer into a larger dataset. Projects on top of FLO — the Open Index
+        Protocol among them — use this field to index ownership records,
+        publish content, and build small applications directly on the chain,
+        without needing a separate database.
+      </p>
+      <dl class="kv">
+        <dt>Consensus</dt><dd>Proof-of-work, scrypt hashing algorithm</dd>
+        <dt>Based on</dt><dd>Bitcoin Core, kept in sync with upstream</dd>
+        <dt>Data field</dt><dd>Up to 1,080 bytes per transaction, permanent once confirmed</dd>
+        <dt>Distribution</dt><dd>No premine, mined from genesis in 2013</dd>
+      </dl>
+    </section>
+
+    <section id="running">
+      <p class="label">running a node</p>
+      <h2>FLO Core: download, sync, run.</h2>
+      <p>
+        FLO Core downloads and verifies the full transaction history — currently
+        several gigabytes — and keeps your copy in sync with the network.
+        Depending on your connection, the first sync can take anywhere from a
+        few hours to a day.
+      </p>
+      <ul class="platform-list">
+        <li>
+          <span class="plat-name">Unix</span>
+          <p>Unpack the release, then run <code>bin/flo-qt</code> for the GUI or <code>bin/flod</code> headless.</p>
+        </li>
+        <li>
+          <span class="plat-name">Windows</span>
+          <p>Unpack the release, then run <code>flo-qt.exe</code>.</p>
+        </li>
+        <li>
+          <span class="plat-name">macOS</span>
+          <p>Drag FLO-Core into Applications, then launch FLO-Core.</p>
+        </li>
+      </ul>
+      <p style="margin-top: 22px;">Building from source instead:</p>
+      <pre>git clone https://github.com/floreloaded/flo.git
+cd flo
+./autogen.sh
+./configure
+make</pre>
+      <p>
+        Full build notes for each platform live in the
+        <a href="https://github.com/floreloaded/flo">doc/</a>
+        directory of the repository, alongside developer notes and the release
+        process.
+      </p>
+    </section>
+
+    <section>
+      <p class="label">contributing</p>
+      <h2>The master branch moves fast; tags are stable.</h2>
+      <p>
+        <code>master</code> is built and tested continuously but isn't
+        guaranteed stable — for a stable release, use one of the
+        <a href="https://github.com/floreloaded/flo">tagged releases</a>.
+        This is a security-critical project: changes are expected to include
+        tests, and pull requests should be reviewed by someone other than the
+        author before merging. The full workflow is in
+        <a href="https://github.com/floreloaded/flo">CONTRIBUTING.md</a>.
+      </p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="fine">
+      FLO Core is released under the MIT license. See
+      <a href="https://github.com/floreloaded/flo">COPYING</a>
+      for details.
+    </p>
+    <nav>
+      <a href="https://github.com/shivampandey-git/flo">Repository</a>
+      <a href="https://github.com/floreloaded/flo">Contributing</a>
+      <a href="https://github.com/floreloaded/flo">Documentation</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
