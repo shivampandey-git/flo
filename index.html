@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FLO — an archival blockchain</title>
+<title>FLO — a universal blockchain</title>
 <meta name="description" content="FLO is a proof-of-work blockchain that lets any transaction carry up to 1,080 bytes of permanent, arbitrary data.">
 <style>
   :root {
@@ -312,6 +312,7 @@
   <div class="wrap">
     <div class="wordmark">FL<em>O</em></div>
     <nav class="top-links">
+      <a href="#universal">Universal</a>
       <a href="#flodata">floData</a>
       <a href="#running">Run a node</a>
       <a href="https://github.com/shivampandey-git/flo">Source</a>
@@ -322,7 +323,7 @@
 <main>
   <div class="wrap">
     <section class="hero" style="border-top:none; padding-top:76px;">
-      <h1>A blockchain built to hold onto things.</h1>
+      <h1>A universal blockchain, built on one key.</h1>
       <p class="lede">
         FLO is a proof-of-work cryptocurrency, forked from Bitcoin, that adds one
         deliberate feature: every transaction can carry up to 1,080 bytes of
@@ -330,7 +331,7 @@
         for a signature, a hash, a record, or a small note that outlives whoever
         wrote it.
       </p>
-      <div class="stat-line">1,080 bytes <span class="dim">per transaction ·</span> scrypt proof-of-work <span class="dim">· no premine, launched 2013</span></div>
+      <div class="stat-line">universal blockchain <span class="dim">·</span> one private key, every chain <span class="dim">· 1,080 bytes per transaction</span></div>
 
       <div class="ledger">
         <svg viewBox="0 0 680 130" role="img" aria-label="Diagram: a chain of blocks, with data written into one transaction">
@@ -373,6 +374,19 @@
       </div>
     </section>
 
+    <section id="universal">
+      <p class="label">universal blockchain</p>
+      <h2>One key. Every chain.</h2>
+      <p>
+        FLO shares its cryptographic foundations with the wider Bitcoin-based
+        ecosystem, which means the same key can carry across chains built the
+        same way. That's the idea behind calling FLO a universal blockchain:
+        it isn't an island — it's built to interoperate with the network of
+        chains around it, rather than requiring a separate identity for each
+        one.
+      </p>
+    </section>
+
     <section id="flodata">
       <p class="label">the floData field</p>
       <h2>Payments, plus a place to write.</h2>
@@ -385,10 +399,10 @@
       </p>
       <p>
         That's enough for a document hash, a timestamped signature, or a
-        pointer into a larger dataset. Projects on top of FLO — the Open Index
-        Protocol among them — use this field to index ownership records,
-        publish content, and build small applications directly on the chain,
-        without needing a separate database.
+        pointer into a larger dataset. Applications built on top of FLO use
+        this field to index ownership records, publish content, and build
+        small tools directly on the chain, without needing a separate
+        database.
       </p>
       <dl class="kv">
         <dt>Consensus</dt><dd>Proof-of-work, scrypt hashing algorithm</dd>
